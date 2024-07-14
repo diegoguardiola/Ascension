@@ -1,4 +1,6 @@
 import React from 'react';
+import * as SupaAscensionApi from '../apis/SupaAscensionApi.js';
+import * as GlobalVariables from '../config/GlobalVariableContext';
 import Images from '../config/Images';
 import Breakpoints from '../utils/Breakpoints';
 import * as StyleSheet from '../utils/StyleSheet';
@@ -16,8 +18,14 @@ import { Image, Modal, Text, View } from 'react-native';
 const ProfileScreen = props => {
   const { theme, navigation } = props;
   const dimensions = useWindowDimensions();
+  const Constants = GlobalVariables.useValues();
+  const Variables = Constants;
+  const setGlobalVariableValue = GlobalVariables.useSetValue();
   const [Logout, setLogout] = React.useState(false);
+  const [loginEmail, setLoginEmail] = React.useState('');
+  const [loginPassword, setLoginPassword] = React.useState('');
   const [switchValue, setSwitchValue] = React.useState(false);
+  const supaAscensionLogoutPOST = SupaAscensionApi.useLogoutPOST();
 
   return (
     <ScreenContainer
@@ -366,6 +374,40 @@ const ProfileScreen = props => {
           </Modal>
         )}
       </>
+      {/* Continue with Email */}
+      <Button
+        iconPosition={'left'}
+        onPress={() => {
+          const handler = async () => {
+            try {
+              (await supaAscensionLogoutPOST.mutateAsync())?.json;
+              setGlobalVariableValue({
+                key: 'AUTHORIZATION_HEADER',
+                value: '',
+              });
+              navigation.navigate('LoginEmailScreen');
+              console.log(Constants['AUTHORIZATION_HEADER']);
+            } catch (err) {
+              console.error(err);
+            }
+          };
+          handler();
+        }}
+        style={StyleSheet.applyWidth(
+          {
+            backgroundColor: theme.colors['Custom Color_5'],
+            borderRadius: 24,
+            fontFamily: 'System',
+            fontSize: 17,
+            fontWeight: '700',
+            height: 56,
+            marginTop: 35,
+            textAlign: 'center',
+          },
+          dimensions.width
+        )}
+        title={'Logout'}
+      />
     </ScreenContainer>
   );
 };

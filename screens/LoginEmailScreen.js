@@ -110,6 +110,13 @@ const LoginEmailScreen = props => {
             autoCapitalize={'none'}
             autoCorrect={true}
             changeTextDelay={500}
+            onChangeText={newTextInputValue => {
+              try {
+                setLoginEmail(newTextInputValue);
+              } catch (err) {
+                console.error(err);
+              }
+            }}
             webShowOutline={true}
             editable={true}
             placeholder={'Enter your email address'}
@@ -164,6 +171,13 @@ const LoginEmailScreen = props => {
                 autoCapitalize={'none'}
                 autoCorrect={true}
                 changeTextDelay={500}
+                onChangeText={newPaswordInputValue => {
+                  try {
+                    setLoginPassword(newPaswordInputValue);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }}
                 webShowOutline={true}
                 editable={true}
                 placeholder={'Create a password'}
@@ -275,6 +289,7 @@ const LoginEmailScreen = props => {
                   navigation.navigate('BottomTabNavigator', {
                     screen: 'ProfileScreen',
                   });
+                  console.log(Constants['AUTHORIZATION_HEADER']);
                 } catch (err) {
                   console.error(err);
                 }
