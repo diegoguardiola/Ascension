@@ -4,11 +4,18 @@ import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const DeviceVariables = {
+  AUTH_HEADER: 'value',
   exerciseList: 0,
   workoutScratch: 0,
   __env__: 'Development',
 };
-export const AppVariables = {};
+export const AppVariables = {
+  apiKey:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVoZmtnYWtkdGVtZGh1Zm9idWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjA4NDEyNTMsImV4cCI6MjAzNjQxNzI1M30.JCWIjqDRt-WpF5oP77S63xiXZeNKrV1SzkotKGqsSf8',
+  AUTHORIZATION_HEADER:
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVoZmtnYWtkdGVtZGh1Zm9idWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjA4NDEyNTMsImV4cCI6MjAzNjQxNzI1M30.JCWIjqDRt-WpF5oP77S63xiXZeNKrV1SzkotKGqsSf8',
+  ERROR_MESSAGE: '',
+};
 const GlobalVariableContext = React.createContext();
 const GlobalVariableUpdater = React.createContext();
 const keySuffix = '';

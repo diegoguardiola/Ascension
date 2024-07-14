@@ -103,13 +103,6 @@ export default function RootAppNavigator() {
         })}
       >
         <Stack.Screen
-          name="LoginEmailScreen"
-          component={LoginEmailScreen}
-          options={({ navigation }) => ({
-            title: 'Login Email',
-          })}
-        />
-        <Stack.Screen
           name="CreateAccountScreen"
           component={CreateAccountScreen}
           options={({ navigation }) => ({
@@ -121,6 +114,13 @@ export default function RootAppNavigator() {
           component={UpdateProfileScreen}
           options={({ navigation }) => ({
             title: 'Update Profile',
+          })}
+        />
+        <Stack.Screen
+          name="LoginEmailScreen"
+          component={LoginEmailScreen}
+          options={({ navigation }) => ({
+            title: 'Login Email',
           })}
         />
         <Stack.Screen

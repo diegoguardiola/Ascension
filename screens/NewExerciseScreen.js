@@ -132,7 +132,19 @@ const NewExerciseScreen = props => {
             style={StyleSheet.applyWidth({ top: 50 }, dimensions.width)}
             title={'Close'}
           />
-          <Pressable androidRippleBorderless={false}>
+          <Pressable
+            onPress={() => {
+              try {
+                setGlobalVariableValue({
+                  key: 'exerciseList',
+                  value: '0',
+                });
+              } catch (err) {
+                console.error(err);
+              }
+            }}
+            androidRippleBorderless={false}
+          >
             <Text
               accessible={true}
               {...GlobalStyles.TextStyles(theme)['Text'].props}

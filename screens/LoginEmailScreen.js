@@ -1,13 +1,13 @@
 import React from 'react';
+import * as SupaAscensionApi from '../apis/SupaAscensionApi.js';
+import * as GlobalVariables from '../config/GlobalVariableContext';
 import Images from '../config/Images';
 import Breakpoints from '../utils/Breakpoints';
 import * as StyleSheet from '../utils/StyleSheet';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import {
   Button,
-  Circle,
   Divider,
-  Icon,
   ScreenContainer,
   TextInput,
   Touchable,
@@ -19,6 +19,11 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 const LoginEmailScreen = props => {
   const { theme, navigation } = props;
   const dimensions = useWindowDimensions();
+  const Constants = GlobalVariables.useValues();
+  const Variables = Constants;
+  const setGlobalVariableValue = GlobalVariables.useSetValue();
+  const [loginEmail, setLoginEmail] = React.useState('');
+  const [loginPassword, setLoginPassword] = React.useState('');
   const [textInputValue, setTextInputValue] = React.useState('');
 
   return (
@@ -27,7 +32,7 @@ const LoginEmailScreen = props => {
       scrollable={false}
       hasTopSafeArea={true}
       style={StyleSheet.applyWidth(
-        { backgroundColor: 'rgb(0,0,0)' },
+        { backgroundColor: theme.colors['Custom Color'] },
         dimensions.width
       )}
     >
@@ -47,38 +52,6 @@ const LoginEmailScreen = props => {
           dimensions.width
         )}
       >
-        <View
-          style={StyleSheet.applyWidth(
-            {
-              alignItems: 'center',
-              height: 48,
-              justifyContent: 'center',
-              left: 16,
-              position: 'absolute',
-              top: 0,
-              width: 48,
-            },
-            dimensions.width
-          )}
-        >
-          <Touchable
-            onPress={() => {
-              try {
-                navigation.goBack();
-              } catch (err) {
-                console.error(err);
-              }
-            }}
-          >
-            <Circle bgColor={theme.colors['Custom Color_2']} size={50}>
-              <Icon
-                size={24}
-                color={theme.colors['Custom Color']}
-                name={'Ionicons/arrow-back-sharp'}
-              />
-            </Circle>
-          </Touchable>
-        </View>
         {/* Screen Heading */}
         <Text
           accessible={true}
@@ -137,13 +110,6 @@ const LoginEmailScreen = props => {
             autoCapitalize={'none'}
             autoCorrect={true}
             changeTextDelay={500}
-            onChangeText={newTextInputValue => {
-              try {
-                setTextInputValue(newTextInputValue);
-              } catch (err) {
-                console.error(err);
-              }
-            }}
             webShowOutline={true}
             editable={true}
             placeholder={'Enter your email address'}
@@ -168,7 +134,7 @@ const LoginEmailScreen = props => {
               },
               dimensions.width
             )}
-            value={textInputValue}
+            value={loginEmail}
           />
           {/* Password */}
           <View>
@@ -198,13 +164,6 @@ const LoginEmailScreen = props => {
                 autoCapitalize={'none'}
                 autoCorrect={true}
                 changeTextDelay={500}
-                onChangeText={newPaswordInputValue => {
-                  try {
-                    setTextInputValue(newPaswordInputValue);
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}
                 webShowOutline={true}
                 editable={true}
                 placeholder={'Create a password'}
@@ -230,7 +189,7 @@ const LoginEmailScreen = props => {
                   },
                   dimensions.width
                 )}
-                value={textInputValue}
+                value={loginPassword}
               />
               <View
                 style={StyleSheet.applyWidth(
@@ -291,6 +250,37 @@ const LoginEmailScreen = props => {
           {/* Continue with Email */}
           <Button
             iconPosition={'left'}
+            onPress={() => {
+              const handler = async () => {
+                try {
+                  const loginResponseJSON = (
+                    await SupaAscensionApi.loginPOST(Constants, {
+                      loginEmail: loginEmail,
+                      loginPassword: loginPassword,
+                    })
+                  )?.json;
+                  const accessToken = loginResponseJSON?.['access_token'];
+                  const message = loginResponseJSON?.['error_description'];
+                  setGlobalVariableValue({
+                    key: 'ERROR_MESSAGE',
+                    value: message,
+                  });
+                  if (!accessToken) {
+                    return;
+                  }
+                  setGlobalVariableValue({
+                    key: 'AUTHORIZATION_HEADER',
+                    value: 'Bearer ' + accessToken,
+                  });
+                  navigation.navigate('BottomTabNavigator', {
+                    screen: 'ProfileScreen',
+                  });
+                } catch (err) {
+                  console.error(err);
+                }
+              };
+              handler();
+            }}
             style={StyleSheet.applyWidth(
               {
                 backgroundColor: theme.colors['Custom Color_5'],
@@ -304,7 +294,7 @@ const LoginEmailScreen = props => {
               },
               dimensions.width
             )}
-            title={'Continue with Email'}
+            title={'Login'}
           />
           {/* continue with */}
           <View
@@ -349,96 +339,6 @@ const LoginEmailScreen = props => {
               )}
             />
           </View>
-          {/* Google Login */}
-          <Touchable
-            style={StyleSheet.applyWidth({ marginTop: 25 }, dimensions.width)}
-          >
-            <View
-              style={StyleSheet.applyWidth(
-                {
-                  alignItems: 'center',
-                  borderBottomWidth: 1,
-                  borderColor: theme.colors['Custom Color_2'],
-                  borderLeftWidth: 1,
-                  borderRadius: 24,
-                  borderRightWidth: 1,
-                  borderTopWidth: 1,
-                  flexDirection: 'row',
-                  height: 56,
-                  justifyContent: 'center',
-                },
-                dimensions.width
-              )}
-            >
-              <Image
-                resizeMode={'cover'}
-                source={Images.IconGoogle}
-                style={StyleSheet.applyWidth(
-                  { height: 24, width: 24 },
-                  dimensions.width
-                )}
-              />
-              <Text
-                accessible={true}
-                style={StyleSheet.applyWidth(
-                  {
-                    color: theme.colors['Custom Color_2'],
-                    fontFamily: 'Inter_500Medium',
-                    fontSize: 16,
-                    marginLeft: 16,
-                  },
-                  dimensions.width
-                )}
-              >
-                {'Continue with Google'}
-              </Text>
-            </View>
-          </Touchable>
-          {/* Apple Login */}
-          <Touchable
-            style={StyleSheet.applyWidth({ marginTop: 25 }, dimensions.width)}
-          >
-            <View
-              style={StyleSheet.applyWidth(
-                {
-                  alignItems: 'center',
-                  borderBottomWidth: 1,
-                  borderColor: theme.colors['Custom Color_2'],
-                  borderLeftWidth: 1,
-                  borderRadius: 24,
-                  borderRightWidth: 1,
-                  borderTopWidth: 1,
-                  flexDirection: 'row',
-                  height: 56,
-                  justifyContent: 'center',
-                },
-                dimensions.width
-              )}
-            >
-              <Image
-                resizeMode={'cover'}
-                source={Images.IconApple}
-                style={StyleSheet.applyWidth(
-                  { height: 24, width: 24 },
-                  dimensions.width
-                )}
-              />
-              <Text
-                accessible={true}
-                style={StyleSheet.applyWidth(
-                  {
-                    color: theme.colors['Custom Color_2'],
-                    fontFamily: 'Inter_500Medium',
-                    fontSize: 16,
-                    marginLeft: 16,
-                  },
-                  dimensions.width
-                )}
-              >
-                {'Continue with Apple'}
-              </Text>
-            </View>
-          </Touchable>
           {/* Sign Up */}
           <View
             style={StyleSheet.applyWidth(
@@ -451,30 +351,7 @@ const LoginEmailScreen = props => {
               dimensions.width
             )}
           >
-            <Text
-              accessible={true}
-              style={StyleSheet.applyWidth(
-                {
-                  color: theme.colors['Custom Color_2'],
-                  fontFamily: 'Inter_400Regular',
-                  fontSize: 16,
-                  opacity: 0.64,
-                },
-                dimensions.width
-              )}
-            >
-              {'Don’t have an account? '}
-            </Text>
-
-            <Touchable
-              onPress={() => {
-                try {
-                  navigation.navigate('CreateAccountScreen');
-                } catch (err) {
-                  console.error(err);
-                }
-              }}
-            >
+            <Touchable>
               <Text
                 accessible={true}
                 style={StyleSheet.applyWidth(

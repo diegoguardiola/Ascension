@@ -1,22 +1,33 @@
 import React from 'react';
-import Images from '../config/Images';
+import * as GlobalStyles from '../GlobalStyles.js';
+import * as SupaAscensionApi from '../apis/SupaAscensionApi.js';
+import * as GlobalVariables from '../config/GlobalVariableContext';
 import Breakpoints from '../utils/Breakpoints';
 import * as StyleSheet from '../utils/StyleSheet';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import {
   Button,
-  Divider,
   ScreenContainer,
   TextInput,
   Touchable,
   withTheme,
 } from '@draftbit/ui';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 const CreateAccountScreen = props => {
   const { theme, navigation } = props;
   const dimensions = useWindowDimensions();
+  const Constants = GlobalVariables.useValues();
+  const Variables = Constants;
+  const setGlobalVariableValue = GlobalVariables.useSetValue();
+  const [emailValue, setEmailValue] = React.useState('');
+  const [firstNameValue, setFirstNameValue] = React.useState('');
+  const [lastNameValue, setLastNameValue] = React.useState('');
+  const [passwordValue, setPasswordValue] = React.useState('');
+  const [signupEmail, setSignupEmail] = React.useState('');
+  const [signupPassword, setSignupPassword] = React.useState('');
   const [textInputValue, setTextInputValue] = React.useState('');
+  const supaAscensionSignupPOST = SupaAscensionApi.useSignupPOST();
 
   return (
     <ScreenContainer
@@ -49,23 +60,6 @@ const CreateAccountScreen = props => {
         >
           {'Create account'}
         </Text>
-        {/* sub title */}
-        <Text
-          accessible={true}
-          style={StyleSheet.applyWidth(
-            {
-              color: theme.colors['Custom Color_2'],
-              fontFamily: 'Inter_400Regular',
-              fontSize: 15,
-              marginTop: 8,
-              opacity: 0.6,
-              textAlign: 'center',
-            },
-            dimensions.width
-          )}
-        >
-          {'Lorem ipsum dolor sit amet'}
-        </Text>
       </View>
       {/* Container */}
       <View
@@ -87,20 +81,21 @@ const CreateAccountScreen = props => {
         >
           {'Email'}
         </Text>
+        {/* Email */}
         <TextInput
           autoCapitalize={'none'}
           autoCorrect={true}
           changeTextDelay={500}
-          onChangeText={newTextInputValue => {
+          onChangeText={newEmailValue => {
             try {
-              setTextInputValue(newTextInputValue);
+              setSignupEmail(newEmailValue);
             } catch (err) {
               console.error(err);
             }
           }}
           webShowOutline={true}
           editable={true}
-          placeholder={'Enter your email address'}
+          placeholder={'Enter your email'}
           placeholderTextColor={theme.colors['Light']}
           style={StyleSheet.applyWidth(
             {
@@ -122,11 +117,86 @@ const CreateAccountScreen = props => {
             },
             dimensions.width
           )}
-          value={textInputValue}
+          value={signupEmail}
         />
-        {/* Continue with Email */}
+        {/* Password */}
+        <Text
+          accessible={true}
+          style={StyleSheet.applyWidth(
+            {
+              color: theme.colors['Custom Color_2'],
+              fontFamily: 'Inter_500Medium',
+            },
+            dimensions.width
+          )}
+        >
+          {'Password\n'}
+        </Text>
+        {/* Password */}
+        <TextInput
+          autoCapitalize={'none'}
+          autoCorrect={true}
+          changeTextDelay={500}
+          onChangeText={newPasswordValue => {
+            try {
+              setSignupPassword(newPasswordValue);
+            } catch (err) {
+              console.error(err);
+            }
+          }}
+          webShowOutline={true}
+          editable={true}
+          placeholder={'Enter your password'}
+          placeholderTextColor={theme.colors['Light']}
+          style={StyleSheet.applyWidth(
+            {
+              borderBottomWidth: 1,
+              borderColor: theme.colors['Custom Color_4'],
+              borderLeftWidth: 1,
+              borderRadius: 5,
+              borderRightWidth: 1,
+              borderTopWidth: 1,
+              color: theme.colors['Custom Color_2'],
+              fontFamily: 'Inter_400Regular',
+              fontSize: 16,
+              height: 52,
+              marginTop: 12,
+              paddingBottom: 8,
+              paddingLeft: 16,
+              paddingRight: 8,
+              paddingTop: 8,
+            },
+            dimensions.width
+          )}
+          value={signupPassword}
+        />
+        {/* Signup */}
         <Button
           iconPosition={'left'}
+          onPress={() => {
+            const handler = async () => {
+              try {
+                const signupResponse = (
+                  await supaAscensionSignupPOST.mutateAsync({
+                    signupEmail: signupEmail,
+                    signupPassword: signupPassword,
+                  })
+                )?.json;
+                const message = signupResponse?.msg;
+                setGlobalVariableValue({
+                  key: 'ERROR_MESSAGE',
+                  value: message,
+                });
+                if (message) {
+                  return;
+                }
+                navigation.navigate('LoginEmailScreen');
+              } catch (err) {
+                console.error(err);
+              }
+            };
+            handler();
+          }}
           style={StyleSheet.applyWidth(
             {
               backgroundColor: theme.colors['Custom Color_5'],
@@ -140,141 +210,8 @@ const CreateAccountScreen = props => {
             },
             dimensions.width
           )}
-          title={'Continue with Email'}
+          title={'Signup'}
         />
-        <View
-          style={StyleSheet.applyWidth(
-            {
-              alignItems: 'center',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              marginTop: 25,
-            },
-            dimensions.width
-          )}
-        >
-          <Divider
-            color={theme.colors['Custom Color_14']}
-            style={StyleSheet.applyWidth(
-              { height: 1, width: 60 },
-              dimensions.width
-            )}
-          />
-          <Text
-            accessible={true}
-            style={StyleSheet.applyWidth(
-              {
-                color: theme.colors['Custom Color_14'],
-                fontFamily: 'Inter_400Regular',
-                fontSize: 16,
-                paddingLeft: 16,
-                paddingRight: 16,
-                textAlign: 'center',
-              },
-              dimensions.width
-            )}
-          >
-            {'Or continue with'}
-          </Text>
-          <Divider
-            color={theme.colors['Custom Color_14']}
-            style={StyleSheet.applyWidth(
-              { height: 1, width: 60 },
-              dimensions.width
-            )}
-          />
-        </View>
-
-        <Touchable
-          style={StyleSheet.applyWidth({ marginTop: 25 }, dimensions.width)}
-        >
-          <View
-            style={StyleSheet.applyWidth(
-              {
-                alignItems: 'center',
-                borderBottomWidth: 1,
-                borderColor: theme.colors['Custom Color_2'],
-                borderLeftWidth: 1,
-                borderRadius: 24,
-                borderRightWidth: 1,
-                borderTopWidth: 1,
-                flexDirection: 'row',
-                height: 56,
-                justifyContent: 'center',
-              },
-              dimensions.width
-            )}
-          >
-            <Image
-              resizeMode={'cover'}
-              source={Images.IconGoogle}
-              style={StyleSheet.applyWidth(
-                { height: 24, width: 24 },
-                dimensions.width
-              )}
-            />
-            <Text
-              accessible={true}
-              style={StyleSheet.applyWidth(
-                {
-                  color: theme.colors['Custom Color_2'],
-                  fontFamily: 'Inter_500Medium',
-                  fontSize: 16,
-                  marginLeft: 16,
-                },
-                dimensions.width
-              )}
-            >
-              {'Continue with Google'}
-            </Text>
-          </View>
-        </Touchable>
-
-        <Touchable
-          style={StyleSheet.applyWidth({ marginTop: 25 }, dimensions.width)}
-        >
-          <View
-            style={StyleSheet.applyWidth(
-              {
-                alignItems: 'center',
-                borderBottomWidth: 1,
-                borderColor: theme.colors['Custom Color_2'],
-                borderLeftWidth: 1,
-                borderRadius: 24,
-                borderRightWidth: 1,
-                borderTopWidth: 1,
-                flexDirection: 'row',
-                height: 56,
-                justifyContent: 'center',
-              },
-              dimensions.width
-            )}
-          >
-            <Image
-              resizeMode={'cover'}
-              source={Images.IconApple}
-              style={StyleSheet.applyWidth(
-                { height: 24, width: 24 },
-                dimensions.width
-              )}
-            />
-            <Text
-              accessible={true}
-              style={StyleSheet.applyWidth(
-                {
-                  color: theme.colors['Custom Color_2'],
-                  fontFamily: 'Inter_500Medium',
-                  fontSize: 16,
-                  marginLeft: 16,
-                },
-                dimensions.width
-              )}
-            >
-              {'Continue with Apple'}
-            </Text>
-          </View>
-        </Touchable>
-
         <View
           style={StyleSheet.applyWidth(
             {
@@ -301,15 +238,7 @@ const CreateAccountScreen = props => {
             {'Already have an account? '}
           </Text>
 
-          <Touchable
-            onPress={() => {
-              try {
-                navigation.navigate('LoginEmailScreen');
-              } catch (err) {
-                console.error(err);
-              }
-            }}
-          >
+          <Touchable>
             <Text
               accessible={true}
               style={StyleSheet.applyWidth(
@@ -324,6 +253,20 @@ const CreateAccountScreen = props => {
               {'Login'}
             </Text>
           </Touchable>
+          {/* Text 2 */}
+          <Text
+            accessible={true}
+            {...GlobalStyles.TextStyles(theme)['Text'].props}
+            style={StyleSheet.applyWidth(
+              StyleSheet.compose(GlobalStyles.TextStyles(theme)['Text'].style, {
+                color: 'rgb(255, 255, 255)',
+              }),
+              dimensions.width
+            )}
+          >
+            {'h'}
+            {Constants['ERROR_MESSAGE']}
+          </Text>
         </View>
       </View>
     </ScreenContainer>

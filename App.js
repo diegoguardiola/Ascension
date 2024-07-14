@@ -40,8 +40,8 @@ const App = () => {
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular: Fonts.Inter_400Regular,
-    Inter_600SemiBold: Fonts.Inter_600SemiBold,
     Inter_500Medium: Fonts.Inter_500Medium,
+    Inter_600SemiBold: Fonts.Inter_600SemiBold,
     Inter_700Bold: Fonts.Inter_700Bold,
   });
 
